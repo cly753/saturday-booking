@@ -8,42 +8,33 @@ import java.util.Map;
 public class MyRequest {
 	public enum Type { ADD, REMOVE, REMOVEALL };
 
-	public static String getEncoded(Type type, String basketSession, String eventDate) throws Exception {
+	public static String getEncodedAdd(String basketSession, String eventDate) throws Exception {
 		Map<String, String> data = getDefaultData();
 
-		switch (type) {
-		case ADD:
-			data.put("action", "add");
-			data.put("price", "15.00");
-			data.put("basketype", "Non Peak");
-
-			data.put("basket_session", basketSession);
-			data.put("event_date", eventDate);
-			break;
-		case REMOVE:
-			data.put("action", "remove");
-
-			data.put("basket_session", basketSession);
-			data.put("event_date", eventDate);
-			break;
-		default:
-			throw new Exception(" MyRequest.getEncoded ");
-		}
+		data.put("action", "add");
+		//			data.put("price", "30.00");
+		//			data.put("basketype", "Peak");
+		data.put("basket_session", basketSession);
+		data.put("event_date", eventDate);
 
 		return getEncoded(data);
 	}
 
-	public static String getEncoded(Type type, String basketSession) throws Exception {
+	public static String getEncodedRemove(String basketSession, String eventDate) throws Exception {
+		Map<String, String> data = getDefaultData();
+
+		data.put("action", "remove");
+		data.put("basket_session", basketSession);
+		data.put("event_date", eventDate);
+
+		return getEncoded(data);
+	}
+
+	public static String getEncodedRemoveAll(String basketSession) throws Exception {
 		Map<String, String> data = getDefaultData();
 		
-		switch (type) {
-		case REMOVEALL:
-			data.put("action", "removeAll");
-			data.put("basket_session", basketSession);
-			break;
-		default:
-			throw new Exception(" MyRequest.getEncoded ");
-		}
+		data.put("action", "removeAll");
+		data.put("basket_session", basketSession);
 		
 		return getEncoded(data);
 	}

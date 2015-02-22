@@ -1,10 +1,9 @@
 package booking;
 
-import holder.Holder;
+import holder.RunnableHolder;
 
 import java.util.ArrayList;
-
-import notification.Notifier;
+import java.util.Scanner;
 
 public class Main {
 
@@ -16,19 +15,19 @@ public class Main {
 		}
 	}
 
-	public static void go() throws Exception {		
+	public static void go() throws Exception {
 		Configure.init();
 			
 		ArrayList<String> date = Configure.getEventDate();
 		
-		Holder h = new Holder();
-		Holder h2 = new Holder();
+		RunnableHolder h = new RunnableHolder();
+		h.addEvent(date.get(0));
+		h.addEvent(date.get(1));
+		h.start();
 		
-		h.hold(date.get(0));
-//		for (int i = 30; i > 0; i--) {
-//			Thread.sleep(1000);
-//			System.out.println("count down... " + i);
-//		}
-		h.release(date.get(0));
+		Scanner sc = new Scanner(System.in);
+		sc.nextInt();
+		h.goon = false;
+		sc.close();
 	}
 }
