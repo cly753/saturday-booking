@@ -1,6 +1,6 @@
 package booking;
 
-import holder.RunnableHolder;
+import holder.ThreadHolder;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -20,7 +20,7 @@ public class Main {
 			
 		ArrayList<String> date = Configure.getEventDate();
 		
-		RunnableHolder h = new RunnableHolder();
+		ThreadHolder h = new ThreadHolder();
 		h.addEvent(date.get(0));
 		h.addEvent(date.get(1));
 		h.start();

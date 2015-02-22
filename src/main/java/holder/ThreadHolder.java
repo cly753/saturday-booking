@@ -3,7 +3,7 @@ package holder;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class RunnableHolder implements Runnable {
+public class ThreadHolder extends Thread {
 	public static int count = 0;
 	private String LABEL = "%%% holder.RunnableHolder %%%";
 
@@ -13,7 +13,7 @@ public class RunnableHolder implements Runnable {
 
 	public boolean goon;
 
-	public RunnableHolder() {
+	public ThreadHolder() {
 		eventDateS = new ArrayList<String>();
 		goon = true;
 
@@ -25,14 +25,14 @@ public class RunnableHolder implements Runnable {
 		return true;
 	}
 
-	public boolean start() {
+	@Override
+	public void start() {
 		if (t == null) {
 			t = new Thread(this, LABEL + " Thread %%%");
 			t.start();
 		}
-		return true;
 	}
-
+	
 	@Override
 	public void run() {
 		Holder holder = new Holder();
@@ -50,7 +50,7 @@ public class RunnableHolder implements Runnable {
 			int interval = 14 * 60 * 1000;
 			while (goon && new Date().getTime() - holder.lastHoldTime.getTime() < interval) {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(300);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					System.out.println(LABEL + " InterruptedException %%%");
