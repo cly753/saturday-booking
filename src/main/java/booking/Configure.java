@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Stream;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -56,11 +60,20 @@ public class Configure {
 		return configure.getInt("EMAIL_PORT");
 	}
 	
-	public static ArrayList<String> getEventDate() {
-		ArrayList<String> temp = new ArrayList<String>();
+	public static ArrayList<Date> getEventDate() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		
+		ArrayList<Date> temp = new ArrayList<Date>();
 		JSONArray arr = configure.getJSONArray("eventDate");
-		for (int i = 0; i < arr.length(); i++)
-			temp.add(arr.getString(i));
+		for (int i = 0; i < arr.length(); i++) {
+			try {
+				temp.add(format.parse(arr.getString(i)));
+			} catch (JSONException e) {
+				System.out.println(LABEL + " JSONException bad json format.");
+			} catch (ParseException e) {
+				System.out.println(LABEL + " ParseException bad event format.");
+			}
+		}
 		return temp;
 	}
 }
