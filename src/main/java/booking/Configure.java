@@ -20,6 +20,11 @@ public class Configure {
 
 	public static final String configurePath = "./configure.json";
 	private static JSONObject configure;
+	
+	public static SimpleDateFormat startFormat;
+	public static SimpleDateFormat responseFormat;
+	public static SimpleDateFormat openFormat;
+	public static SimpleDateFormat eventFormat;
 
 	public static boolean init() throws IOException {
 		System.out.println("Configure File: " + new File(configurePath).getAbsolutePath());
@@ -29,6 +34,11 @@ public class Configure {
 		configure = new JSONObject(configureRaw);
 
 		lines.close();
+		
+		startFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		responseFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz"); // Sat, 21 Feb 2015 14:06:52 GMT
+		eventFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		openFormat = new SimpleDateFormat("yyyy-MM-dd 00:00");
 		return true;
 	}
 	
@@ -38,6 +48,10 @@ public class Configure {
 
 	public static String getUrlApi() {
 		return configure.getString("URL_API");
+	}
+	
+	public static String getUrlLoad() {
+		return configure.getString("URL_LOAD");
 	}
 	
 	public static String getEmailUser() {
@@ -76,5 +90,14 @@ public class Configure {
 		}
 		return temp;
 	}
+
+	//	{
+	//	    "buttontype": "Non Peak",
+	//	    "sportId": "7",
+	//	    "price": "15.00",
+	//	    "start": "2015-03-06 08:00:00",
+	//	    "courts_avail": 2,
+	//	    "touristPrice": "22.00"
+	//	}
 }
 
