@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,15 +22,12 @@ import booking.Configure;
 
 public class MyRequest {
 	private static final String LABEL = "%%% holder.MyRequest %%%";
-
 	public static ConcurrentLinkedQueue<String> error;
-
-	public static boolean init() {
+	public static void init() {
 		error = new ConcurrentLinkedQueue<String>();
-		return true;
 	}
 
-	public static boolean requestAdd(String basketSession, String eventDate) {
+	public static boolean requestAdd(ThreadHolder th) {
 		try {
 			boolean ok = true;
 
@@ -41,52 +37,49 @@ public class MyRequest {
 
 			con.setDoOutput(true);
 			DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-			dos.writeBytes(MyRequest.getEncodedAdd(basketSession, eventDate));
-			dos.flush();
-			dos.close();
+			dos.writeBytes(MyRequest.getEncodedAdd(th.basketSession, Configure.eventFormat.format(th.eventDate)));
+			dos.flush(); dos.close();
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String responseBody = br.lines()
-					.reduce("", String::concat);
-			br.close();
-
+			InputStreamReader is = new InputStreamReader(con.getInputStream());
+			BufferedReader br = new BufferedReader(is);
+			String responseBody = br.lines() .reduce("", String::concat);
+			is.close(); br.close();
+			
+//			System.out.println(LABEL + th.getName() + "        hold : " + th.eventDate);
+//			System.out.println(LABEL + th.getName() + "req basketId : " + th.basketSession);
+			
 			JSONObject tempJson = new JSONObject(responseBody);		
-			basketSession = tempJson.getString("basketSessionId");
-
-			Date lastRequestTime = Configure.responseFormat.parse(con.getHeaderField("Date"));
-			System.out.println(LABEL + " hold..." + eventDate);
-			//		System.out.println("response code: " + con.getResponseCode());
-			//		System.out.println("response body: \n" + responseBody);
-			System.out.println("last hold time: " + lastRequestTime.toString());
-			System.out.println("time now      : " + Configure.responseFormat.format(new Date()));
-			System.out.println();
+			th.basketSession = tempJson.getString("basketSessionId");
+			
+//			System.out.println(LABEL + th.getName() + "res basketId : " + th.basketSession);
+//			System.out.println(LABEL + th.getName() + "response body: " + responseBody);
+//			System.out.println();
 
 			if (con.getResponseCode() != 200) {
 				ok = false;
-				error.add("responseCode = " + con.getResponseCode());
+				error.add(LABEL + th.getName() + "responseCode = " + con.getResponseCode());
 			}
 			if (!tempJson.isNull("error")) {
 				ok = false;
-				error.add(eventDate + ": " + tempJson.getString("error"));
+				error.add(LABEL + th.getName() + th.eventDate + ": " + tempJson.getString("error"));
 			}
-			//		con.disconnect();
+			con.disconnect();
 			return ok;
-		} catch (IOException | ParseException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-			error.add("In requestAdd(...): " + e.getClass().getSimpleName());
+			error.add(LABEL + th.getName() + "In requestAdd(...): " + e.getClass().getSimpleName());
 		} catch (Exception e) {
-			error.add("In requestAdd(...): " + e.getClass().getSimpleName());
+			error.add(LABEL + th.getName() + "In requestAdd(...): " + e.getClass().getSimpleName());
 		}
 		return false;
 	}
-	public static boolean requestRemove(String basketSession, String eventDate) {
-		//		System.out.println(LABEL + " remove..." + eventDate);
+	public static boolean requestRemove(ThreadHolder th) {
 		try {
 			boolean ok = true;
 
-			if (basketSession == null || basketSession == "0") {
+			if (th.basketSession == "0") {
 				ok = false;
-				error.add("No basket in hand");
+				error.add(LABEL + th.getName() + "No basket in hand");
 				return ok;
 			}
 
@@ -96,40 +89,41 @@ public class MyRequest {
 
 			con.setDoOutput(true);
 			DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-			dos.writeBytes(MyRequest.getEncodedRemove(basketSession, eventDate));
+			dos.writeBytes(MyRequest.getEncodedRemove(th.basketSession, Configure.eventFormat.format(th.eventDate)));
 			dos.flush();
 			dos.close();
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String responseBody = br.lines()
-					.reduce("", String::concat);
-			br.close();
+			InputStreamReader is = new InputStreamReader(con.getInputStream());
+			BufferedReader br = new BufferedReader(is);
+			String responseBody = br.lines() .reduce("", String::concat);
+			is.close(); br.close();
 
-			JSONObject tempJson = new JSONObject(responseBody);
-			//		System.out.println("response code: " + con.getResponseCode());
-			//		System.out.println("response body: \n" + responseBody);
-			System.out.println();
-
+//			System.out.println(LABEL + th.getName() + "      remove : " + th.eventDate);
+//			System.out.println(LABEL + th.getName() + "req basketId : " + th.basketSession);
+//			System.out.println(LABEL + th.getName() + "response body: " + responseBody);
+//			System.out.println();	
+			
 			if (con.getResponseCode() != 200) {
 				ok = false;
-				error.add("responseCode = " + con.getResponseCode());
+				error.add(LABEL + th.getName() + "responseCode = " + con.getResponseCode());
 			}
+			
+			JSONObject tempJson = new JSONObject(responseBody);
 			if (!tempJson.isNull("error")) {
 				ok = false;
-				error.add(eventDate + ": " + tempJson.getString("error"));
+				error.add(LABEL + th.getName() + th.eventDate + ": " + tempJson.getString("error"));
 			}
-			//		con.disconnect();
+//			con.disconnect();
 			return ok;
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
-			error.add("In requestAdd(...): " + e.getClass().getSimpleName());
+			error.add(LABEL + th.getName() + "In requestAdd(...): " + e.getClass().getSimpleName());
 		} catch (Exception e) {
-			error.add("In requestAdd(...): " + e.getClass().getSimpleName());
+			error.add(LABEL + th.getName() + "In requestAdd(...): " + e.getClass().getSimpleName());
 		}
 		return false;
 	}
-	public static boolean requestRemoveAll(String basketSession) {
-		//		System.out.println(LABEL + " remove all...");
+	public static boolean requestRemoveAll(ThreadHolder th) {
 		try {
 			boolean ok = true;
 
@@ -139,35 +133,37 @@ public class MyRequest {
 
 			con.setDoOutput(true);
 			DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-			dos.writeBytes(MyRequest.getEncodedRemoveAll(basketSession));
+			dos.writeBytes(MyRequest.getEncodedRemoveAll(th.basketSession));
 			dos.flush();
 			dos.close();
+			
+			InputStreamReader is = new InputStreamReader(con.getInputStream());
+			BufferedReader br = new BufferedReader(is);
+			String responseBody = br.lines() .reduce("", String::concat);
+			is.close(); br.close();
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String responseBody = br.lines()
-					.reduce("", String::concat);
-			br.close();
-
+//			System.out.println(LABEL + th.getName() + " remove All... ");
+//			System.out.println(LABEL + th.getName() + "req basketId : " + th.basketSession);
+//			System.out.println(LABEL + th.getName() + "response body: " + responseBody);
+//			System.out.println();
+			
 			JSONObject tempJson = new JSONObject(responseBody);
-			//		System.out.println("response code: " + con.getResponseCode());
-			//		System.out.println("response body: \n" + responseBody);
-			//		System.out.println();
 
 			if (con.getResponseCode() != 200) {
 				ok = false;
-				error.add("responseCode = " + con.getResponseCode());
+				error.add(LABEL + th.getName() + "responseCode = " + con.getResponseCode());
 			}
 			if (!tempJson.isNull("error")) {
 				ok = false;
-				error.add("error response: " + tempJson.getString("error"));
+				error.add(LABEL + th.getName() + "error response: " + tempJson.getString("error"));
 			}
 			//		con.disconnect();
 			return ok;
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
-			error.add("In requestAdd(...): " + e.getClass().getTypeName());
+			error.add(LABEL + th.getName() + "In requestAdd(...): " + e.getClass().getTypeName());
 		} catch (Exception e) {
-			error.add("In requestAdd(...): " + e.getClass().getTypeName());
+			error.add(LABEL + th.getName() + "In requestAdd(...): " + e.getClass().getTypeName());
 		}
 		return false;
 	}

@@ -6,3 +6,6 @@ pom.xml.next
 release.properties
 
 configure.json
+
+*.log
+log.*

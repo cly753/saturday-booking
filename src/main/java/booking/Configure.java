@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.stream.Stream;
 
@@ -99,5 +100,27 @@ public class Configure {
 	//	    "courts_avail": 2,
 	//	    "touristPrice": "22.00"
 	//	}
+	
+	public static String getDateString() {
+		Calendar c = Calendar.getInstance();
+		
+		String year   = "" + (c.get(Calendar.YEAR) - 1900);
+		String month  = "" + c.get(Calendar.MONTH);
+		String day    = "" + (c.get(Calendar.DAY_OF_WEEK) - 1);
+		String hour   = "" + c.get(Calendar.HOUR_OF_DAY);
+		String minute = "" + c.get(Calendar.MINUTE);
+		String second = "" + c.get(Calendar.SECOND);
+		String milli  = "" + c.get(Calendar.MILLISECOND);
+		
+//		System.out.println(year  );
+//		System.out.println(month );
+//		System.out.println(day   );
+//		System.out.println(hour  );
+//		System.out.println(minute);
+//		System.out.println(second);
+//		System.out.println(milli );
+		
+		return year + month + day + hour + minute + second + milli;
+	}
 }
 

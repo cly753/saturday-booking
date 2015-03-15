@@ -12,54 +12,45 @@ public class ThreadHolder extends Thread {
 	public int id;
 
 	public Date eventDate;
+	public String basketSession;
+
 	public Date openTime;
 
-	private String basketSession;
-	private boolean holding;
-	private Date lastHoldTime;
-
 	private boolean goon;
-	private final long interval = 13 * 60 * 1000;
+	private final long interval = 14 * 60 * 1000;
 
 	@Override
 	public void run() {
 		try {
 			while (true) {
-				while (goon && !holding) {
-					holding = gank();
-					if (holding) {
-						System.out.print(LABEL + " " + eventDate + " ok.\n");
+				while (!(goon = gank()))
+					if (new Date().getTime() - openTime.getTime() > 7 * 1000) {
+						System.out.println("%\n" + LABEL + " sorry... " + eventDate + "\n%");
 						break;
 					}
-
-					if (new Date().getTime() - openTime.getTime() > 10 * 1000) {
-						System.out.println("%\n" + LABEL + " sorry..... + " + eventDate + "\n%");
-						goon = false;
-					}
-				}
+				
 				if (!goon) break;
+				else System.out.println(LABEL + " " + eventDate + " ok. " + this.basketSession);
 
-				farm();
-
-				boolean resultPush = push();
-				holding = false;
+				System.out.println(LABEL + " go to sleep...");
+				Thread.sleep(interval);
+				
+				push();
 				openTime = new Date();
 			}
 		} catch (InterruptedException e) {
 			System.out.println(LABEL + " Exception: " + e.getMessage());
+			push();
 		}
-		push();
 	}
 
 	public ThreadHolder(Date date) {
 		id = count++;
 		LABEL = LABEL + " id = " + id + " %%%";
-		this.setName(LABEL);
+		this.setName(" holder " + id + " ");
 
-		eventDate = date;
-		holding = false;
 		goon = true;
-		lastHoldTime = new Date(0);
+		eventDate = date;
 		basketSession = "0";
 
 		openTime = new Date(eventDate.getTime() - 6 * 24 * 60 * 60 * 1000);
@@ -72,34 +63,24 @@ public class ThreadHolder extends Thread {
 	}
 
 	public boolean gank() {
-		boolean ok = MyRequest.requestAdd(this.basketSession, Configure.eventFormat.format(eventDate));
-		lastHoldTime = new Date(); // sync
-		System.out.println(this.basketSession);
+		System.out.println(LABEL + " gank: " + Configure.eventFormat.format(eventDate));
+		boolean ok = MyRequest.requestAdd(this);
 		if (!ok)
 			while (MyRequest.error.size() > 0)
 				System.out.println("Error: Holder: " + MyRequest.error.poll());
 		return ok;
-	}
-
-	public void farm() throws InterruptedException {
-		while (new Date().getTime() - lastHoldTime.getTime() < interval) {
-			System.out.print(id);
-			Thread.sleep(90 * 1000);
-		}
-		System.out.println();
 	}
 
 	public boolean push() {
 		System.out.println(LABEL + " push() %%%");
-		boolean ok = MyRequest.requestRemoveAll(this.basketSession);
-		lastHoldTime = new Date(0);
+		boolean ok = MyRequest.requestRemoveAll(this);
 		if (!ok)
 			while (MyRequest.error.size() > 0)
 				System.out.println("Error: Holder: " + MyRequest.error.poll());
 		return ok;
 	}
 
-	public void letMe() {
+	public void terminate() {
 		goon = false;
 		this.interrupt();
 	}
