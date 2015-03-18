@@ -9,11 +9,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import another.ActPlan;
 
 
 public class Configure {
@@ -121,6 +124,34 @@ public class Configure {
 //		System.out.println(milli );
 		
 		return year + month + day + hour + minute + second + milli;
+	}
+	
+	public static String getActEmail() {
+		return configure.getString("ACT_EMAIL");
+	}
+	public static String getActPassword() {
+		return configure.getString("ACT_PASSWORD");
+	}
+	public static String getActUrlLogin() {
+		return configure.getString("ACT_URL_LOGIN");
+	}
+	public static String getActUrlActivity() {
+		return configure.getString("ACT_URL_ACTIVITY");
+	}
+	public static String getActUrlVenue() {
+		return configure.getString("ACT_URL_VENUE");
+	}
+	public static String getActWantedActivity() {
+		return configure.getString("ACT_WANTED_ACTIVITY");
+	}
+	public static String getActUrlSlotPre() {
+		return configure.getString("ACT_URL_SLOT_PRE");
+	}
+	public static List<ActPlan> getActWantedPlan() {
+		return null;
+	}
+	public static String getActUrlSlot() {
+		return configure.getString("ACT_URL_SLOT");
 	}
 }
 

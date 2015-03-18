@@ -5,10 +5,11 @@ import holder.Space;
 import holder.ThreadHolder;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+
+import another.ActMain;
 
 public class Main {
 
@@ -21,6 +22,12 @@ public class Main {
 			return ;
 		}
 		
+//		try {
+//			ActMain am = new ActMain();
+//			am.go();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		go();
 	}
 

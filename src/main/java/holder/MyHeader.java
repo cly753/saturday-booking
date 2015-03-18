@@ -12,8 +12,7 @@ class MyHeader {
 		header = new HashMap<String, String>();
 		header.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
 		header.put("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
-		header.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-		// ...
+//		header.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 	}
 	
 	public Map<String, String> getHeader() {
