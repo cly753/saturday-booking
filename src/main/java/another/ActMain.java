@@ -5,13 +5,15 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import booking.Configure;
 
@@ -24,7 +26,6 @@ public class ActMain {
 
 	private Map<String, Integer> activity_list;
 	private Map<String, Integer> venue_list;
-	
 	private List<ActPlan> plan_list;
 
 	public ActMain() throws Exception {
@@ -103,7 +104,7 @@ public class ActMain {
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");		
 	}
 
-	private void getActivity() throws Exception {
+	private Map<String, Integer> getActivity() throws Exception {
 		URL actUrl = new URL(Configure.getActUrlActivity());
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -117,8 +118,8 @@ public class ActMain {
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		if (DEBUG) while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
 
-//		System.out.println(allLine);
-		parseActivity(allLine);
+		//		System.out.println(allLine);
+		return parseActivity(allLine);
 	}
 	private void setActivityHeader() {
 		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
@@ -129,11 +130,12 @@ public class ActMain {
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
-	private void parseActivity(String raw) {
-		activity_list = new HashMap<String, Integer>();
+	private Map<String, Integer> parseActivity(String raw) {
+		Document doc = Jsoup.parse(raw);
+		return new HashMap<String, Integer>();
 	}
 
-	private void getVenue(int activity_id) throws Exception {
+	private Map<String, Integer> getVenue(int activity_id) throws Exception {
 		URL actUrl = new URL(Configure.getActUrlVenue());
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -147,8 +149,8 @@ public class ActMain {
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		if (DEBUG) while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
 
-		System.out.println(allLine);
-		parseVenue(allLine);
+		//		System.out.println(allLine);
+		return parseVenue(allLine);
 	}
 	private void setVenueHeader() {
 		actCon.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -161,11 +163,14 @@ public class ActMain {
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 		actCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 	}
-	private void parseVenue(String raw) {
-		venue_list = new HashMap<String, Integer>();
+	private Map<String, Integer> parseVenue(String raw) {
+		return new HashMap<String, Integer>();
 	}
-	
-	private void getSlotPre(ActPlan ap) throws Exception {
+
+	/*
+	 * @return time string for query
+	 */
+	private String getSlotPre(ActPlan ap) throws Exception {
 		URL actUrl = new URL(Configure.getActUrlSlotPre() + "?" + getSlotPreData(ap));
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -180,7 +185,7 @@ public class ActMain {
 		if (DEBUG) while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
 
 		System.out.println(allLine);
-		parseSlotPre(allLine);
+		return parseSlotPre(allLine);
 	}
 	private void setSlotPreHeader() {
 		actCon.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -192,19 +197,25 @@ public class ActMain {
 		actCon.setRequestProperty("Referer", Configure.getActUrlActivity());
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
+	/*
+	 * @return payload for pre-query
+	*/
 	private String getSlotPreData(ActPlan ap) {
 		return "";
-//		activity_filter:
-//		venue_filter:
-//		day_filter:
-//		date_filter:
-//		search:
+		//		activity_filter:
+		//		venue_filter:
+		//		day_filter:
+		//		date_filter:
+		//		search:
 	}
-	private void parseSlotPre(String raw) {
-		
+	private String parseSlotPre(String raw) {
+		return "";
 	}
-	
-	private void getSlot(ActPlan ap) throws Exception {
+
+	/*
+	 * @return all slot information for activity+venue+date
+	 */
+	private List<ActSlot> getSlot(ActPlan ap) throws Exception {
 		URL actUrl = new URL(Configure.getActUrlSlot() + getSlotUrl(ap) + "?" + getSlotData(ap));
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -219,7 +230,7 @@ public class ActMain {
 		if (DEBUG) while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
 
 		System.out.println(allLine);
-		parseSlot(allLine);
+		return parseSlot(allLine);
 	}
 	private void setSlotHeader() {
 		actCon.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -231,14 +242,67 @@ public class ActMain {
 		actCon.setRequestProperty("Referer", Configure.getActUrlActivity());
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
+	/*
+	 * @return url for pre-query
+	*/
 	private String getSlotUrl(ActPlan ap) {
 		return "";
 	}
+	/*
+	 * @return payload for pre-query
+	*/
 	private String getSlotData(ActPlan ap) {
 		return "";
-//		time_from:
+		//		time_from:
 	}
-	private void parseSlot(String raw) {
-		
+	private List<ActSlot> parseSlot(String raw) {
+		return null;
 	}
+	/*
+	 * @return whether available
+	*/
+	private boolean checkValid(ActPlan ap, List<ActSlot> slot) {
+		return true;
+	}
+	/*
+	 * @return whether added
+	*/
+	private boolean addToCart(ActPlan ap, ActSlot as) {
+		return true;
+	}
+
+	/*
+	 * @return slot in hand
+	*/
+	private List<ActSlot> getCart() throws Exception {
+		URL actUrl = new URL(Configure.getActUrlCart());
+		actCon = (HttpsURLConnection) actUrl.openConnection();
+		actCon.setRequestMethod("GET");
+		actCon.setUseCaches(false);
+		setCartHeader();
+
+		int responseCode = actCon.getResponseCode();
+		if (DEBUG) System.out.println("response code = " + responseCode);
+		cookie = actCon.getHeaderFields().get("Set-Cookie");
+
+		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
+		if (DEBUG) while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
+
+		System.out.println(allLine);
+		return parseCart(allLine);
+	}
+	private void setCartHeader() {
+		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, lzma, sdch");
+		actCon.setRequestProperty("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
+		actCon.setRequestProperty("Connection", "keep-alive");
+		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
+		actCon.setRequestProperty("Host", this.host);
+		actCon.setRequestProperty("Referer", Configure.getActUrlActivity());
+		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
+	}
+	private List<ActSlot> parseCart(String raw) {
+		return null;
+	}
+
 }

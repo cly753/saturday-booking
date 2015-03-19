@@ -153,5 +153,10 @@ public class Configure {
 	public static String getActUrlSlot() {
 		return configure.getString("ACT_URL_SLOT");
 	}
+	
+	
+	public static String getActUrlCart() {
+		return configure.getString("ACT_URL_CART");
+	}
 }
 
