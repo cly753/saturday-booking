@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-import another.ActMain;
+import Act.ActMain;
 
 public class Main {
 
@@ -22,13 +22,10 @@ public class Main {
 			return ;
 		}
 		
-//		try {
-//			ActMain am = new ActMain();
-//			am.go();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-		go();
+		ActMain am = new ActMain();
+		am.go();
+
+//		go();
 	}
 
 	public static void go() {

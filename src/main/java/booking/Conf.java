@@ -10,20 +10,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.PriorityQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.stream.Stream;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import another.ActPlan;
+import ActElse.ActPlan;
 
 
 public class Conf {
 	public static final String LABEL = "%%% booking.Configure %%%";
 
 	public static final String configurePath = "./configure.json";
-	private static JSONObject configure;
+	private static JSONObject conf;
 	
 	public static SimpleDateFormat startFormat;
 	public static SimpleDateFormat responseFormat;
@@ -35,7 +36,7 @@ public class Conf {
 		Stream<String> lines = Files.lines(Paths.get(configurePath));
 		String configureRaw = lines
 				.reduce("", String::concat);
-		configure = new JSONObject(configureRaw);
+		conf = new JSONObject(configureRaw);
 
 		lines.close();
 		
@@ -47,42 +48,42 @@ public class Conf {
 	}
 	
 	public static String getUrlEntry() {
-		return configure.getString("URL_ENTRY");
+		return conf.getString("URL_ENTRY");
 	}
 
 	public static String getUrlApi() {
-		return configure.getString("URL_API");
+		return conf.getString("URL_API");
 	}
 	
 	public static String getUrlLoad() {
-		return configure.getString("URL_LOAD");
+		return conf.getString("URL_LOAD");
 	}
 	
 	public static String getEmailUser() {
-		return configure.getString("EMAIL_USER");
+		return conf.getString("EMAIL_USER");
 	}
 	
 	public static String getEmailPass() {
-		return configure.getString("EMAIL_PASS");
+		return conf.getString("EMAIL_PASS");
 	}
 	
 	public static String getEmailTo() {
-		return configure.getString("EMAIL_TO");
+		return conf.getString("EMAIL_TO");
 	}
 	
 	public static String getEmailHost() {
-		return configure.getString("EMAIL_HOST");
+		return conf.getString("EMAIL_HOST");
 	}
 	
 	public static int getEmailPort() {
-		return configure.getInt("EMAIL_PORT");
+		return conf.getInt("EMAIL_PORT");
 	}
 	
 	public static ArrayList<Date> getEventDate() {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		
 		ArrayList<Date> temp = new ArrayList<Date>();
-		JSONArray arr = configure.getJSONArray("eventDate");
+		JSONArray arr = conf.getJSONArray("eventDate");
 		for (int i = 0; i < arr.length(); i++) {
 			try {
 				temp.add(format.parse(arr.getString(i)));
@@ -127,36 +128,38 @@ public class Conf {
 	}
 	
 	public static String getActEmail() {
-		return configure.getString("ACT_EMAIL");
+		return conf.getString("ACT_EMAIL");
 	}
 	public static String getActPassword() {
-		return configure.getString("ACT_PASSWORD");
+		return conf.getString("ACT_PASSWORD");
 	}
 	public static String getActUrlLogin() {
-		return configure.getString("ACT_URL_LOGIN");
+		return conf.getString("ACT_URL_LOGIN");
 	}
 	public static String getActUrlActivity() {
-		return configure.getString("ACT_URL_ACTIVITY");
+		return conf.getString("ACT_URL_ACTIVITY");
 	}
 	public static String getActUrlVenue() {
-		return configure.getString("ACT_URL_VENUE");
+		return conf.getString("ACT_URL_VENUE");
 	}
 	public static String getActUrlSlotPre() {
-		return configure.getString("ACT_URL_SLOT_PRE");
+		return conf.getString("ACT_URL_SLOT_PRE");
 	}
-	public static PriorityQueue<ActPlan> getActWantedPlan() {
+	public static PriorityBlockingQueue<ActPlan> getActWantedPlan() {
+		//TODO
 		return null;
 	}
 	public static String getActUrlSlot() {
-		return configure.getString("ACT_URL_SLOT");
+		return conf.getString("ACT_URL_SLOT");
 	}
-	
-	
 	public static String getActUrlCart() {
-		return configure.getString("ACT_URL_CART");
+		return conf.getString("ACT_URL_CART");
 	}
 	public static String getActUrlDelete() {
-		return configure.getString("ACT_URL_DELETE");
+		return conf.getString("ACT_URL_DELETE");
+	}
+	public static int getActSleepTime() {
+		return conf.getInt("ACT_SLEEP_TIME");
 	}
 }
 

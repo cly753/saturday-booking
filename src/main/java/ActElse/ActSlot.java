@@ -1,4 +1,4 @@
-package another;
+package ActElse;
 
 public class ActSlot {
 	public String activity;

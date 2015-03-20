@@ -1,20 +1,42 @@
 package Act;
 
+import java.util.concurrent.PriorityBlockingQueue;
+
+import ActElse.ActPlan;
+import ActStateS.ActStopState;
 import ActStateS.ActUnauthorizedState;
 
 public class ActEngine extends Thread {
-
-	public ActEngine() {
-		
+	public enum ACTION { GOON, STOP };
+	
+	private ActContext context;
+	private ACTION action;
+	
+	public ActEngine(String email, String password, PriorityBlockingQueue<ActPlan> planList) {
+		this.action = ACTION.GOON;
+		context = new ActContext(email, password, planList, this);
 	}
 	
 	@Override
-	public void run() {
-		ActContext context = new ActContext();
+	public void run() {		
+		ActUnauthorizedState unauthorized = new ActUnauthorizedState();
+		context.setState(unauthorized);
 		
-//		ActUnauthorizedState unauthorized = new ActUnauthorizedState();
-//		unauthorized.doAction(context);
-		
-		
+		while (true) {
+			ActState currentState = context.getState();
+			if (currentState instanceof ActStopState) {
+				currentState.doAction(context);
+				break;
+			}
+			
+			currentState.doAction(context);
+		}
+	}
+	
+	public void setAction(ACTION action) {
+		this.action = action;
+	}
+	public ACTION getAction() {
+		return action;
 	}
 }
