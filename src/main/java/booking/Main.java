@@ -15,7 +15,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			Configure.init();
+			Conf.init();
 			MyRequest.init();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -32,7 +32,7 @@ public class Main {
 	}
 
 	public static void go() {
-		ArrayList<Date> date = Configure.getEventDate();
+		ArrayList<Date> date = Conf.getEventDate();
 		ArrayList<ThreadHolder> hArr = new ArrayList<ThreadHolder>();
 		for (Date d : date)
 			hArr.add(new ThreadHolder(d));
@@ -41,7 +41,7 @@ public class Main {
 		if (peek) {
 			boolean poll = true;
 			while (poll && new Date().getTime() - hArr.get(0).openTime.getTime() < 5 * 1000) {
-					ArrayList<Space> spaces = MyRequest.requestLoad(Configure.getDateString());
+					ArrayList<Space> spaces = MyRequest.requestLoad(Conf.getDateString());
 					if (spaces == null) {
 						while (MyRequest.error.size() > 0)
 							System.out.println(MyRequest.error.poll());

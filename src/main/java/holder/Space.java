@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import booking.Configure;
+import booking.Conf;
 
 public class Space {	
 //	{
@@ -36,7 +36,7 @@ public class Space {
 	public boolean sameStart(Date that) {
 		Date start;
 		try {
-			start = Configure.startFormat.parse(value.get("start"));
+			start = Conf.startFormat.parse(value.get("start"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 			return false;
@@ -49,7 +49,7 @@ public class Space {
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(that);
 			int dayOfThat = cal.get(Calendar.DAY_OF_YEAR);
-			Date start = Configure.startFormat.parse(value.get("start"));
+			Date start = Conf.startFormat.parse(value.get("start"));
 			cal.setTime(start);
 			int day = cal.get(Calendar.DAY_OF_YEAR);
 			return dayOfThat == day;

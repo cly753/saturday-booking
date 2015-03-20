@@ -18,7 +18,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import booking.Configure;
+import booking.Conf;
 
 public class MyRequest {
 	private static final String LABEL = "%%% holder.MyRequest %%%";
@@ -31,13 +31,13 @@ public class MyRequest {
 		try {
 			boolean ok = true;
 
-			HttpsURLConnection con = (HttpsURLConnection)new URL(Configure.getUrlApi()).openConnection();
+			HttpsURLConnection con = (HttpsURLConnection)new URL(Conf.getUrlApi()).openConnection();
 			con.setRequestMethod("POST");
 			MyHeader.setHeader(new MyHeader(), con);
 
 			con.setDoOutput(true);
 			DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-			dos.writeBytes(MyRequest.getEncodedAdd(th.basketSession, Configure.eventFormat.format(th.eventDate)));
+			dos.writeBytes(MyRequest.getEncodedAdd(th.basketSession, Conf.eventFormat.format(th.eventDate)));
 			dos.flush(); dos.close();
 
 			InputStreamReader is = new InputStreamReader(con.getInputStream());
@@ -83,13 +83,13 @@ public class MyRequest {
 				return ok;
 			}
 
-			HttpsURLConnection con = (HttpsURLConnection)new URL(Configure.getUrlApi()).openConnection();
+			HttpsURLConnection con = (HttpsURLConnection)new URL(Conf.getUrlApi()).openConnection();
 			con.setRequestMethod("POST");
 			MyHeader.setHeader(new MyHeader(), con);
 
 			con.setDoOutput(true);
 			DataOutputStream dos = new DataOutputStream(con.getOutputStream());
-			dos.writeBytes(MyRequest.getEncodedRemove(th.basketSession, Configure.eventFormat.format(th.eventDate)));
+			dos.writeBytes(MyRequest.getEncodedRemove(th.basketSession, Conf.eventFormat.format(th.eventDate)));
 			dos.flush();
 			dos.close();
 
@@ -127,7 +127,7 @@ public class MyRequest {
 		try {
 			boolean ok = true;
 
-			HttpsURLConnection con = (HttpsURLConnection)new URL(Configure.getUrlApi()).openConnection();
+			HttpsURLConnection con = (HttpsURLConnection)new URL(Conf.getUrlApi()).openConnection();
 			con.setRequestMethod("POST");
 			MyHeader.setHeader(new MyHeader(), con);
 
@@ -173,7 +173,7 @@ public class MyRequest {
 		try {
 			boolean ok = true;
 
-			String url = Configure.getUrlLoad() + "?" + MyRequest.getEncodedLoad(magic);
+			String url = Conf.getUrlLoad() + "?" + MyRequest.getEncodedLoad(magic);
 			HttpsURLConnection con = (HttpsURLConnection)new URL(url).openConnection();
 			con.setRequestMethod("GET");
 			MyHeader.setHeader(new MyHeader(), con);

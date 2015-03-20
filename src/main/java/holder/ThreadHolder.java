@@ -3,7 +3,7 @@ package holder;
 import java.text.ParseException;
 import java.util.Date;
 
-import booking.Configure;
+import booking.Conf;
 
 public class ThreadHolder extends Thread {
 	public static int count = 0;
@@ -55,15 +55,15 @@ public class ThreadHolder extends Thread {
 
 		openTime = new Date(eventDate.getTime() - 6 * 24 * 60 * 60 * 1000);
 		try {
-			openTime = Configure.openFormat.parse(Configure.openFormat.format(openTime));
+			openTime = Conf.openFormat.parse(Conf.openFormat.format(openTime));
 		} catch (ParseException e) {
 			System.out.println(LABEL + " " + e.getClass().getSimpleName());
 		}
-		System.out.println(LABEL + " event: " + Configure.eventFormat.format(eventDate) + ", open time: " + Configure.eventFormat.format(openTime));
+		System.out.println(LABEL + " event: " + Conf.eventFormat.format(eventDate) + ", open time: " + Conf.eventFormat.format(openTime));
 	}
 
 	public boolean gank() {
-		System.out.println(LABEL + " gank: " + Configure.eventFormat.format(eventDate));
+		System.out.println(LABEL + " gank: " + Conf.eventFormat.format(eventDate));
 		boolean ok = MyRequest.requestAdd(this);
 		if (!ok)
 			while (MyRequest.error.size() > 0)

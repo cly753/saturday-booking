@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
 import org.json.JSONArray;
@@ -19,7 +19,7 @@ import org.json.JSONObject;
 import another.ActPlan;
 
 
-public class Configure {
+public class Conf {
 	public static final String LABEL = "%%% booking.Configure %%%";
 
 	public static final String configurePath = "./configure.json";
@@ -141,13 +141,10 @@ public class Configure {
 	public static String getActUrlVenue() {
 		return configure.getString("ACT_URL_VENUE");
 	}
-	public static String getActWantedActivity() {
-		return configure.getString("ACT_WANTED_ACTIVITY");
-	}
 	public static String getActUrlSlotPre() {
 		return configure.getString("ACT_URL_SLOT_PRE");
 	}
-	public static List<ActPlan> getActWantedPlan() {
+	public static PriorityQueue<ActPlan> getActWantedPlan() {
 		return null;
 	}
 	public static String getActUrlSlot() {
@@ -157,6 +154,9 @@ public class Configure {
 	
 	public static String getActUrlCart() {
 		return configure.getString("ACT_URL_CART");
+	}
+	public static String getActUrlDelete() {
+		return configure.getString("ACT_URL_DELETE");
 	}
 }
 
