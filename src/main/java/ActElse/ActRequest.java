@@ -115,13 +115,13 @@ public class ActRequest {
 		return allLine;
 	}
 	private void setActivityHeader() {
-		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch");
-		actCon.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
-		actCon.setRequestProperty("Connection", "keep-alive");
+//		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+//		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch");
+//		actCon.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
+//		actCon.setRequestProperty("Connection", "keep-alive");
 		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
-		actCon.setRequestProperty("Host", this.host);
-		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
+//		actCon.setRequestProperty("Host", this.host);
+//		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
 	
 
