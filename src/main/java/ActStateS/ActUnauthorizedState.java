@@ -1,13 +1,16 @@
 package ActStateS;
 
+import java.util.Map.Entry;
+
 import Act.ActContext;
-import Act.ActEngine;
 import Act.ActState;
 import ActElse.ActUtil;
 
 public class ActUnauthorizedState implements ActState {
 	private ActContext context;
 	private static final String label = "## ActUnauthorizedState ##";
+	
+	private static final boolean DEBUG = false;
 
 	@Override
 	public void doAction(ActContext context) {
@@ -47,8 +50,17 @@ public class ActUnauthorizedState implements ActState {
 		res = context.ar.getActivity();
 		context.activityList = ActUtil.parseActivity(res);
 		
-//		res = context.ar.getVenue(context.activityList.get(context.ap.activity));
-//		context.venueList = ActUtil.parseVenue(res);
+		if (DEBUG) for (Entry<String, Integer> e : context.activityList.entrySet())
+			System.out.println("key: " + e.getKey() + ", value: " + e.getValue());
+		if (DEBUG) System.out.println("activity: " + context.ap.activity + ", id: " + context.activityList.get(context.ap.activity));
+		
+		res = context.ar.getVenue(context.activityList.get(context.ap.activity));
+		context.venueList = ActUtil.parseVenue(res);
+		
+		//TODO check "max_date" in response
+		
+		if (DEBUG) for (Entry<String, Integer> e : context.venueList.entrySet())
+			System.out.println("key: " + e.getKey() + ", value: " + e.getValue());
 		
 		return true;
 	}

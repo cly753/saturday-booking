@@ -31,6 +31,8 @@ public class ActContext {
 		this.planList = planList;
 		this.ar = new ActRequest();
 		this.parent = parent;
+		
+		ap = planList.poll();
 	}
 	
 	public ActState getState() {

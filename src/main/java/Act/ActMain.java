@@ -4,7 +4,7 @@ import booking.Conf;
 
 public class ActMain {	
 	public static void go() {
-		ActEngine ae = new ActEngine(Conf.getActEmail(), Conf.getActPassword(), Conf.getActWantedPlan());
+		ActEngine ae = new ActEngine(Conf.getActEmail(), Conf.getActPassword(), Conf.getActPlan());
 		ae.run();
 		
 		//TODO accept input

@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.PriorityQueue;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.stream.Stream;
 
@@ -145,9 +145,26 @@ public class Conf {
 	public static String getActUrlSlotPre() {
 		return conf.getString("ACT_URL_SLOT_PRE");
 	}
-	public static PriorityBlockingQueue<ActPlan> getActWantedPlan() {
-		//TODO
-		return null;
+	public static PriorityBlockingQueue<ActPlan> getActPlan() {
+		PriorityBlockingQueue<ActPlan> pbq = new PriorityBlockingQueue<ActPlan>();
+		JSONArray ja = conf.getJSONArray("ACT_PLAN");
+		for (int i = 0; i < ja.length(); i++) {
+			JSONObject jo = ja.getJSONObject(i);
+			List<Integer> hour = new ArrayList<Integer>();
+			JSONArray jahour = jo.getJSONArray("hour");
+			for (int j = 0; j < jahour.length(); j++)
+				hour.add(jahour.getInt(j));
+			ActPlan ap = new ActPlan
+					( jo.getString("activity")
+					, jo.getString("venue")
+					, jo.getInt("dayInWeek")
+					, jo.getInt("dayInMonth")
+					, jo.getInt("month")
+					, hour, jo.getInt("priority")
+					);
+			pbq.put(ap);
+		}
+		return pbq;
 	}
 	public static String getActUrlSlot() {
 		return conf.getString("ACT_URL_SLOT");

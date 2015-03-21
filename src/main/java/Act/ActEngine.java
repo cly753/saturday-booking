@@ -16,7 +16,7 @@ public class ActEngine extends Thread {
 	}
 	
 	@Override
-	public void run() {		
+	public void run() {
 		ActUnauthorizedState unauthorized = new ActUnauthorizedState();
 		context.setState(unauthorized);
 		

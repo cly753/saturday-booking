@@ -106,11 +106,8 @@ public class ActRequest {
 		while ((oneLine = br.readLine()) != null)
 			allLine += oneLine; 
 		br.close();
-		if (DEBUG) {
-			System.out.println(label + lbl + actUrl);
-			System.out.println(label + lbl + actCon.getHeaderField("Content-Type"));
+		if (DEBUG)
 			System.out.println(label + lbl + allLine);
-		}
 		
 		return allLine;
 	}
@@ -123,10 +120,9 @@ public class ActRequest {
 //		actCon.setRequestProperty("Host", this.host);
 //		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
-	
 
 	public String getVenue(int activity_id) throws Exception {
-		URL actUrl = new URL(Conf.getActUrlVenue());
+		URL actUrl = new URL(Conf.getActUrlVenue() + "/" + activity_id);
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
 		actCon.setUseCaches(false);
@@ -137,9 +133,9 @@ public class ActRequest {
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
-		if (DEBUG) while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
-
-		//System.out.println(allLine);
+		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
+		
+		if (DEBUG) System.out.println(allLine);
 		return allLine;
 	}
 	private void setVenueHeader() {
@@ -207,7 +203,7 @@ public class ActRequest {
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
-		while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
+		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
 		if (DEBUG) System.out.println(allLine);
 		return allLine;
@@ -244,7 +240,7 @@ public class ActRequest {
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
-		while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
+		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
 		if (DEBUG) System.out.println(allLine);
 		return allLine;
@@ -275,7 +271,7 @@ public class ActRequest {
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
-		while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
+		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
 		if (DEBUG) System.out.println(allLine);
 		return allLine;
@@ -312,7 +308,7 @@ public class ActRequest {
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
-		while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
+		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
 		if (DEBUG) System.out.println(allLine);
 		return allLine;

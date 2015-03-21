@@ -5,15 +5,25 @@ import holder.Space;
 import holder.ThreadHolder;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
+
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attributes;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import Act.ActMain;
 
 public class Main {
 
 	public static void main(String[] args) {
+//		test();
+		
 		try {
 			Conf.init();
 			MyRequest.init();
@@ -21,11 +31,15 @@ public class Main {
 			e.printStackTrace();
 			return ;
 		}
-		
+
 		ActMain am = new ActMain();
 		am.go();
 
 //		go();
+	}
+	
+	public static void test() {
+
 	}
 
 	public static void go() {
