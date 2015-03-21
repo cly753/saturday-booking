@@ -24,12 +24,10 @@ public class ActEngine extends Thread {
 		
 		while (true) {
 			ActState currentState = context.getState();
+			currentState.doAction(context);
 			if (currentState instanceof ActStopState) {
-				currentState.doAction(context);
 				break;
 			}
-			
-			currentState.doAction(context);
 		}
 	}
 	

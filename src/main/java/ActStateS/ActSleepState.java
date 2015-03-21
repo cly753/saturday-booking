@@ -18,11 +18,11 @@ public class ActSleepState implements ActState {
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
-			context.setState(new ActDeleteState());
+			context.setState(new ActStopState()); // handover
 		} catch (Exception e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
-			context.setState(new ActDeleteState());
+			context.setState(new ActStopState()); // unknow error
 		}
 	}
 }

@@ -33,16 +33,11 @@ public class ActDeleteState implements ActState {
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
-			if (context.parent.getAction().equals(ActEngine.ACTION.STOP)) {
-				context.setState(new ActStopState());
-			}
-			else {
-				context.setState(new ActStopState()); // unrecoverable / reserved
-			}
+			context.setState(new ActStopState());
 		} catch (Exception e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
-			context.setState(new ActStopState()); // unrecoverable
+			context.setState(new ActStopState()); // unknow error
 		}
 	}
 }
