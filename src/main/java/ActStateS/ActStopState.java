@@ -6,6 +6,7 @@ import ActElse.ActUtil;
 
 public class ActStopState implements ActState {
 	ActContext context;
+	private static final String label = "## ActStopState ##";
 
 	@Override
 	public void doAction(ActContext context) {		

@@ -10,10 +10,13 @@ import ActElse.ActUtil;
 
 public class ActQueryState implements ActState {
 	private ActContext context;
+	private static final String label = "## ActQueryState ##";
 
 	@Override
 	public void doAction(ActContext context) {
 		this.context = context;
+		
+		System.out.println(label);
 		
 		try {
 			String location = context.ar.getSlotPre

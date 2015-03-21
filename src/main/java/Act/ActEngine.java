@@ -10,10 +10,8 @@ public class ActEngine extends Thread {
 	public enum ACTION { GOON, STOP };
 	
 	private ActContext context;
-	private ACTION action;
 	
 	public ActEngine(String email, String password, PriorityBlockingQueue<ActPlan> planList) {
-		this.action = ACTION.GOON;
 		context = new ActContext(email, password, planList, this);
 	}
 	
@@ -29,12 +27,5 @@ public class ActEngine extends Thread {
 				break;
 			}
 		}
-	}
-	
-	public void setAction(ACTION action) {
-		this.action = action;
-	}
-	public ACTION getAction() {
-		return action;
 	}
 }

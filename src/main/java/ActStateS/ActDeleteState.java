@@ -7,10 +7,13 @@ import ActElse.ActUtil;
 
 public class ActDeleteState implements ActState {
 	private ActContext context;
+	private static final String label = "## ActDeleteState ##";
 
 	@Override
 	public void doAction(ActContext context) {
 		this.context = context;
+		
+		System.out.println(label);
 
 		try {
 			String res = context.ar.getCart();

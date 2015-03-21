@@ -7,10 +7,13 @@ import Act.ActState;
 
 public class ActSleepState implements ActState {
 	private ActContext context;
+	private static final String label = "## ActSleepState ##";
 
 	@Override
 	public void doAction(ActContext context) {
 		this.context = context;
+		
+		System.out.println(label);
 		
 		try {
 			ActEngine.sleep(Conf.getActSleepTime());

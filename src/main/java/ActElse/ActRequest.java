@@ -3,9 +3,11 @@ package ActElse;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -14,15 +16,20 @@ import booking.Conf;
 
 public class ActRequest {
 	private boolean DEBUG = true;
+	private static final String label = "## ActRequest ## ";
+	
 	private String host;
 	HttpsURLConnection actCon;
 	List<String> cookie;
 	
 	public ActRequest() {
 		CookieHandler.setDefault(new CookieManager());
+		cookie = new ArrayList<String>();
 	}
 	
 	public boolean sayHi() throws Exception {
+		String lbl = "## sayHi ## ";
+		
 		URL actUrl = new URL(Conf.getActUrlLogin());
 		host = actUrl.getHost();
 		
@@ -39,13 +46,15 @@ public class ActRequest {
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println("response code = " + responseCode);
+		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
 		
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 		return true;
 	}
 
 	public boolean login(String email, String password) throws Exception {
+		String lbl = "## login ## ";
+		
 		URL actUrl = new URL(Conf.getActUrlLogin());
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 
@@ -60,7 +69,7 @@ public class ActRequest {
 		dos.writeBytes("email=" + email + "&password=" + password); dos.flush(); dos.close();
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println("response code = " + responseCode);
+		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
 
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 		return true;
@@ -80,6 +89,8 @@ public class ActRequest {
 	}
 
 	public String getActivity() throws Exception {
+		String lbl = "## getActivity ## ";
+
 		URL actUrl = new URL(Conf.getActUrlActivity());
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -87,24 +98,32 @@ public class ActRequest {
 		setActivityHeader();
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println("response code = " + responseCode);
+		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
 		cookie = actCon.getHeaderFields().get("Set-Cookie");
 
-		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
-		while ((oneLine = br.readLine()) != null) allLine += "response| " + oneLine; br.close();
-		if (DEBUG) System.out.println(allLine);
+		String oneLine, allLine = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
+		while ((oneLine = br.readLine()) != null)
+			allLine += oneLine; 
+		br.close();
+		if (DEBUG) {
+			System.out.println(label + lbl + actUrl);
+			System.out.println(label + lbl + actCon.getHeaderField("Content-Type"));
+			System.out.println(label + lbl + allLine);
+		}
 		
 		return allLine;
 	}
 	private void setActivityHeader() {
 		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, lzma, sdch");
-		actCon.setRequestProperty("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
+		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch");
+		actCon.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
 		actCon.setRequestProperty("Connection", "keep-alive");
 		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
+	
 
 	public String getVenue(int activity_id) throws Exception {
 		URL actUrl = new URL(Conf.getActUrlVenue());
@@ -135,6 +154,7 @@ public class ActRequest {
 		actCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 	}
 
+	
 	public String getSlotPre(int activity_id, int venue_id, int dayInWeek, int dayInMonth) throws Exception {
 		URL actUrl = new URL(Conf.getActUrlSlotPre() + "?" + getSlotPrePayload(activity_id, venue_id, dayInWeek, dayInMonth));
 		actCon = (HttpsURLConnection) actUrl.openConnection();
@@ -174,6 +194,7 @@ public class ActRequest {
 		//		search:
 	}
 
+	
 	public String getSlot(String location) throws Exception {
 		URL actUrl = new URL(location);
 		actCon = (HttpsURLConnection) actUrl.openConnection();
@@ -202,6 +223,7 @@ public class ActRequest {
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
 
+	
 	public String hold(String magicUrl, String magicPayload, String referer) throws Exception {
 		URL actUrl = new URL(magicUrl);
 		actCon = (HttpsURLConnection) actUrl.openConnection();
@@ -240,6 +262,7 @@ public class ActRequest {
 		actCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 	}
 
+	
 	public String getCart() throws Exception {
 		URL actUrl = new URL(Conf.getActUrlCart());
 		actCon = (HttpsURLConnection) actUrl.openConnection();
@@ -268,6 +291,7 @@ public class ActRequest {
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
 
+	
 	public String delete(int booking_id, int shopping_cart_item_id) throws Exception {
 		URL actUrl = new URL(Conf.getActUrlDelete());
 		actCon = (HttpsURLConnection) actUrl.openConnection();

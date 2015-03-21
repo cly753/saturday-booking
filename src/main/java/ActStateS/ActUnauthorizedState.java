@@ -7,15 +7,20 @@ import ActElse.ActUtil;
 
 public class ActUnauthorizedState implements ActState {
 	private ActContext context;
+	private static final String label = "## ActUnauthorizedState ##";
 
 	@Override
 	public void doAction(ActContext context) {
 		this.context = context;
 		
+		System.out.println(label);
+		
 		try {
-			login();
+//			login();
 			updateList();
-			context.setState(new ActQueryState());
+			
+			context.setState(new ActStopState());
+//			context.setState(new ActQueryState());
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
@@ -42,8 +47,8 @@ public class ActUnauthorizedState implements ActState {
 		res = context.ar.getActivity();
 		context.activityList = ActUtil.parseActivity(res);
 		
-		res = context.ar.getVenue(context.activityList.get(context.ap.activity));
-		context.venueList = ActUtil.parseVenue(res);
+//		res = context.ar.getVenue(context.activityList.get(context.ap.activity));
+//		context.venueList = ActUtil.parseVenue(res);
 		
 		return true;
 	}
