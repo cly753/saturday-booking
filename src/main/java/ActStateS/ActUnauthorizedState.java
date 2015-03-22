@@ -37,7 +37,7 @@ public class ActUnauthorizedState implements ActState {
 		boolean result;
 		
 		result = context.ar.sayHi();
-//		result = context.ar.login(context.email, context.password);
+		result = context.ar.login(context.email, context.password);
 		
 		return true;
 	}

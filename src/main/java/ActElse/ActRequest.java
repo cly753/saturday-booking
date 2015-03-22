@@ -7,12 +7,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.CookieStore;
-import java.net.HttpCookie;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,14 +27,13 @@ public class ActRequest {
 
 	CookieManager cookieManager;
 	HttpsURLConnection actCon;
-	List<String> cookie;
 
 	public ActRequest() {
+		host = Conf.getActHost();
+		
 		cookieManager = new CookieManager( null, CookiePolicy.ACCEPT_ALL );
 		CookieHandler.setDefault( cookieManager );
 		HttpsURLConnection.setFollowRedirects(true);
-
-		cookie = new ArrayList<String>();
 	}
 
 	private void setCommonHeader() {
@@ -52,7 +49,6 @@ public class ActRequest {
 		String lbl = "## sayHi ## ";
 
 		URL actUrl = new URL(Conf.getActUrlLogin());
-		host = actUrl.getHost();
 
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -65,18 +61,7 @@ public class ActRequest {
 
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
-
-		//		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		//		if (tempCookie != null)
-		//			cookie = tempCookie;
-
 		if (DEBUG) for (Entry<String, List<String>> e : actCon.getHeaderFields().entrySet()) System.out.println(label + lbl + "key: " + e.getKey() + ", value: " + e.getValue());
-		CookieStore cookieJar =  cookieManager.getCookieStore();
-		List <HttpCookie> cookies =
-				cookieJar.getCookies();
-		for (HttpCookie cookie: cookies) {
-			System.out.println("CookieHandler retrieved cookie: " + cookie);
-		}
 		return true;
 	}
 
@@ -86,10 +71,6 @@ public class ActRequest {
 
 		URL actUrl = new URL(Conf.getActUrlLogin() + "/signin");
 		actCon = (HttpsURLConnection) actUrl.openConnection();
-
-		if (DEBUG) System.out.println(label + lbl + actCon.getURL());
-		if (DEBUG) for (Entry<String, List<String>> e : actCon.getHeaderFields().entrySet()) System.out.println(label + lbl + "key: " + e.getKey() + ", value: " + e.getValue());
-
 		actCon.setUseCaches(false);
 		setLoginHeader();
 
@@ -97,21 +78,18 @@ public class ActRequest {
 		//		actCon.setDoInput(true); // default
 
 		DataOutputStream dos = new DataOutputStream(actCon.getOutputStream());
-		dos.writeBytes("email=" + URLEncoder.encode(email, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8")); dos.flush(); dos.close();
+		//TODO _csrf field?
+		dos.writeBytes("email=" + URLEncoder.encode(email, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&_csrf" + "");
+		dos.flush(); dos.close();
 
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
-
-		//		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		//		if (tempCookie != null)
-		//			cookie = tempCookie;
-
 		if (DEBUG) System.out.println(label + lbl + actCon.getURL());
-		String oneLine, allLine = "";
-		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
-		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
-		if (DEBUG) System.out.println(label + lbl + allLine);
-		if (DEBUG) for (Entry<String, List<String>> e : actCon.getHeaderFields().entrySet()) System.out.println(label + lbl + "key: " + e.getKey() + ", value: " + e.getValue());
+		
+//		String oneLine, allLine = "";
+//		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
+//		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
+//		if (DEBUG) System.out.println(label + lbl + allLine);
 		return true;
 	}
 	private void setLoginHeader() {
@@ -119,7 +97,6 @@ public class ActRequest {
 		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 		actCon.setRequestProperty("Cache-Control", "max-age=0");
 		actCon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		//		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", host);
 		actCon.setRequestProperty("Origin", "https://" + this.host);
 		actCon.setRequestProperty("Referer", "https://" + this.host + "/auth");
@@ -138,10 +115,6 @@ public class ActRequest {
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
 
-		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		if (tempCookie != null)
-			cookie = tempCookie;
-
 		String oneLine, allLine = "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
@@ -154,7 +127,6 @@ public class ActRequest {
 	private void setActivityHeader() {
 		setCommonHeader();
 		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 	}
 
@@ -180,7 +152,6 @@ public class ActRequest {
 	private void setVenueHeader() {
 		setCommonHeader();
 		actCon.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("Referer", Conf.getActUrlActivity());
 		actCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
@@ -202,10 +173,6 @@ public class ActRequest {
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
 
-		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		if (tempCookie != null)
-			cookie = tempCookie;
-
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
@@ -215,8 +182,6 @@ public class ActRequest {
 	private void setSlotPreHeader() {
 		setCommonHeader();
 		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		if (cookie == null) System.out.println("xxx");
-		for (String coo : cookie) if (coo != null) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]); else System.out.println("yyy");
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("Referer", Conf.getActUrlActivity());
 	}
@@ -253,10 +218,6 @@ public class ActRequest {
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println("response code = " + responseCode);
 
-		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		if (tempCookie != null)
-			cookie = tempCookie;
-
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
@@ -264,14 +225,10 @@ public class ActRequest {
 		return allLine;
 	}
 	private void setSlotHeader() {
+		setCommonHeader();
 		actCon.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, lzma, sdch");
-		actCon.setRequestProperty("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
-		actCon.setRequestProperty("Connection", "keep-alive");
-		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("Referer", Conf.getActUrlActivity());
-		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
 
 
@@ -295,10 +252,6 @@ public class ActRequest {
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println("response code = " + responseCode);
 
-		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		if (tempCookie != null)
-			cookie = tempCookie;
-
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
@@ -306,15 +259,11 @@ public class ActRequest {
 		return allLine;
 	}
 	private void setHoldHeader(String referer) {
+		setCommonHeader();
 		actCon.setRequestProperty("Accept", "*/*");
-		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, lzma");
-		actCon.setRequestProperty("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
-		actCon.setRequestProperty("Connection", "keep-alive");
 		actCon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("Referer", referer);
-		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 		actCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 	}
 
@@ -332,10 +281,6 @@ public class ActRequest {
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println("response code = " + responseCode);
 
-		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		if (tempCookie != null)
-			cookie = tempCookie;
-
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
@@ -343,14 +288,10 @@ public class ActRequest {
 		return allLine;
 	}
 	private void setCartHeader() {
+		setCommonHeader();
 		actCon.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, lzma, sdch");
-		actCon.setRequestProperty("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
-		actCon.setRequestProperty("Connection", "keep-alive");
-		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("Referer", Conf.getActUrlActivity());
-		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 	}
 
 
@@ -374,10 +315,6 @@ public class ActRequest {
 		int responseCode = actCon.getResponseCode();
 		if (DEBUG) System.out.println("response code = " + responseCode);
 
-		List<String> tempCookie = actCon.getHeaderFields().get("Set-Cookie");
-		if (tempCookie != null)
-			cookie = tempCookie;
-
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
@@ -386,15 +323,10 @@ public class ActRequest {
 	}
 	private void setDeleteHeader() {
 		actCon.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, lzma");
-		actCon.setRequestProperty("Accept-Language", "en-GB,en-US;q=0.8,en;q=0.6");
-		actCon.setRequestProperty("Connection", "keep-alive");
 		actCon.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-		for (String coo : cookie) actCon.addRequestProperty("Cookie", coo.split(";", 1)[0]);
 		actCon.setRequestProperty("Host", this.host);
 		actCon.setRequestProperty("Origin", "https://" + this.host);
 		actCon.setRequestProperty("Referer", Conf.getActUrlCart());
-		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36 OPR/28.0.1750.40");
 		actCon.setRequestProperty("X-Requested-With", "XMLHttpRequest");
 	}
 }

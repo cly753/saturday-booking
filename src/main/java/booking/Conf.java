@@ -178,5 +178,8 @@ public class Conf {
 	public static int getActSleepTime() {
 		return conf.getInt("ACT_SLEEP_TIME");
 	}
+	public static String getActHost() {
+		return conf.getString("ACT_HOST");
+	}
 }
 
