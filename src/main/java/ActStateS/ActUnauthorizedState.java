@@ -8,9 +8,7 @@ import ActElse.ActUtil;
 
 public class ActUnauthorizedState implements ActState {
 	private ActContext context;
-	private static final String label = "## ActUnauthorizedState ##";
-	
-	private static final boolean DEBUG = false;
+	private static final String label = "## ActUnauthorizedState ## ";
 
 	@Override
 	public void doAction(ActContext context) {
@@ -19,8 +17,8 @@ public class ActUnauthorizedState implements ActState {
 		System.out.println(label);
 		
 		try {
-//			login();
-			updateList();
+			login();
+//			updateList();
 			
 			context.setState(new ActStopState());
 //			context.setState(new ActQueryState());
@@ -30,7 +28,7 @@ public class ActUnauthorizedState implements ActState {
 			context.setState(new ActStopState());
 		} catch (Exception e) {
 			//TODO change to logger
-			System.out.println(e.getClass().getSimpleName());
+			e.printStackTrace();
 			context.setState(new ActStopState());
 		}
 	}
@@ -39,20 +37,21 @@ public class ActUnauthorizedState implements ActState {
 		boolean result;
 		
 		result = context.ar.sayHi();
-		result = context.ar.login(context.email, context.password);
+//		result = context.ar.login(context.email, context.password);
 		
 		return true;
 	}
 	
 	private boolean updateList() throws Exception {
+		boolean DEBUG = false;
+		
 		String res;
 		
 		res = context.ar.getActivity();
 		context.activityList = ActUtil.parseActivity(res);
 		
 		if (DEBUG) for (Entry<String, Integer> e : context.activityList.entrySet())
-			System.out.println("key: " + e.getKey() + ", value: " + e.getValue());
-		if (DEBUG) System.out.println("activity: " + context.ap.activity + ", id: " + context.activityList.get(context.ap.activity));
+			System.out.println(label + "key: " + e.getKey() + ", value: " + e.getValue());
 		
 		res = context.ar.getVenue(context.activityList.get(context.ap.activity));
 		context.venueList = ActUtil.parseVenue(res);
@@ -60,7 +59,7 @@ public class ActUnauthorizedState implements ActState {
 		//TODO check "max_date" in response
 		
 		if (DEBUG) for (Entry<String, Integer> e : context.venueList.entrySet())
-			System.out.println("key: " + e.getKey() + ", value: " + e.getValue());
+			System.out.println(label + "key: " + e.getKey() + ", value: " + e.getValue());
 		
 		return true;
 	}

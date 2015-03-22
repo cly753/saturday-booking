@@ -19,42 +19,42 @@ public class ActQueryState implements ActState {
 		System.out.println(label);
 		
 		try {
-			String location = context.ar.getSlotPre
+			String res = context.ar.getSlotPre
 					( context.activityList.get(context.ap.activity)
 					, context.venueList.get(context.ap.venue)
-					, context.ap.dayInWeek
-					, context.ap.dayInMonth
+					, context.ap.date
 					);
 			
-			String res = context.ar.getSlot(location);
-			List<ActSlot> slot = ActUtil.parseSlot(res);
+			context.setState(new ActStopState());
 			
-			boolean result = ActUtil.checkValid(context.ap, slot);
-			if (result) {
-				
-				//TODO
-				// set magic
-				// set magic
-				// set location
-				
-				context.setState(new ActHoldState());
-			}
-			else {
-				context.ap = context.planList.poll();
-				if (context.ap == null) {
-					context.setState(new ActStopState());
-				}
-				else {
-					context.setState(new ActQueryState());
-				}
-			}
+//			List<ActSlot> slot = ActUtil.parseSlot(res);
+//			
+//			boolean result = ActUtil.checkValid(context.ap, slot);
+//			if (result) {
+//				
+//				//TODO
+//				// set magic
+//				// set magic
+//				// set location
+//				
+//				context.setState(new ActHoldState());
+//			}
+//			else {
+//				context.ap = context.planList.poll();
+//				if (context.ap == null) {
+//					context.setState(new ActStopState());
+//				}
+//				else {
+//					context.setState(new ActQueryState());
+//				}
+//			}
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
 			context.setState(new ActStopState());
 		} catch (Exception e) {
 			//TODO change to logger
-			System.out.println(e.getClass().getSimpleName());
+			e.printStackTrace();
 			context.setState(new ActStopState());
 		}
 	}

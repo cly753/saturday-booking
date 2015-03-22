@@ -1,11 +1,19 @@
 package Act;
 
+import java.text.ParseException;
+
+import org.json.JSONException;
+
 import booking.Conf;
 
 public class ActMain {	
 	public static void go() {
-		ActEngine ae = new ActEngine(Conf.getActEmail(), Conf.getActPassword(), Conf.getActPlan());
-		ae.run();
+		try {
+			ActEngine ae = new ActEngine(Conf.getActEmail(), Conf.getActPassword(), Conf.getActPlan());
+			ae.run();
+		} catch (JSONException | ParseException e) {
+			e.printStackTrace();
+		}
 		
 		//TODO accept input
 		

@@ -145,7 +145,7 @@ public class Conf {
 	public static String getActUrlSlotPre() {
 		return conf.getString("ACT_URL_SLOT_PRE");
 	}
-	public static PriorityBlockingQueue<ActPlan> getActPlan() {
+	public static PriorityBlockingQueue<ActPlan> getActPlan() throws JSONException, ParseException {
 		PriorityBlockingQueue<ActPlan> pbq = new PriorityBlockingQueue<ActPlan>();
 		JSONArray ja = conf.getJSONArray("ACT_PLAN");
 		for (int i = 0; i < ja.length(); i++) {
@@ -154,14 +154,14 @@ public class Conf {
 			JSONArray jahour = jo.getJSONArray("hour");
 			for (int j = 0; j < jahour.length(); j++)
 				hour.add(jahour.getInt(j));
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			ActPlan ap = new ActPlan
-					( jo.getString("activity")
-					, jo.getString("venue")
-					, jo.getInt("dayInWeek")
-					, jo.getInt("dayInMonth")
-					, jo.getInt("month")
-					, hour, jo.getInt("priority")
-					);
+						( jo.getString("activity")
+						, jo.getString("venue")
+						, sdf.parse(jo.getString("date"))
+						, hour, jo.getInt("priority")
+						);
 			pbq.put(ap);
 		}
 		return pbq;
