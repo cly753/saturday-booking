@@ -32,10 +32,10 @@ public class Main {
 			return ;
 		}
 
-		ActMain am = new ActMain();
-		am.go();
+//		ActMain am = new ActMain();
+//		am.go();
 
-//		go();
+		go();
 	}
 	
 	public static void test() {
