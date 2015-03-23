@@ -2,7 +2,10 @@ package holder;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import booking.ActionListener;
 import booking.Conf;
 
 public class ThreadHolder extends Thread {
@@ -26,15 +29,16 @@ public class ThreadHolder extends Thread {
 				while (!(goon = gank()))
 					if (new Date().getTime() - openTime.getTime() > 7 * 1000) {
 						System.out.println("%\n" + LABEL + " sorry... " + eventDate + "\n%");
+						selfExitEvent();
 						break;
 					}
-				
+
 				if (!goon) break;
 				else System.out.println(LABEL + " " + eventDate + " ok. " + this.basketSession);
 
 				System.out.println(LABEL + " go to sleep...");
 				Thread.sleep(interval);
-				
+
 				push();
 				openTime = new Date();
 			}
@@ -83,5 +87,15 @@ public class ThreadHolder extends Thread {
 	public void terminate() {
 		goon = false;
 		this.interrupt();
+	}
+
+	private Map<String, ActionListener> listener;
+	public void addListener(String event, ActionListener al) {
+		if (listener == null)
+			listener = new HashMap<String, ActionListener>();
+		listener.put(event, al);
+	}
+	public void selfExitEvent() {
+		listener.get("selfExitEvent").doAction();
 	}
 }
