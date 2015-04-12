@@ -3,5 +3,5 @@ package ActElse;
 /**
  * booking > ActElse
  */
-public class ActUtil {
+public class ActRequestCommonUtil {
 }
