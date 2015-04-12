@@ -1,22 +1,24 @@
 package ActStateS;
 
-import java.util.List;
-
 import Act.ActContext;
-import Act.ActEngine;
 import Act.ActState;
+import ActElse.ActRequestUtil;
 import ActElse.ActSlot;
-import ActElse.ActUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ActQueryState implements ActState {
 	private ActContext context;
 	private static final String label = "## ActQueryState ##";
+	private static final Logger logger = LoggerFactory.getLogger(ActQueryState.class);
 
 	@Override
 	public void doAction(ActContext context) {
 		this.context = context;
-		
-		System.out.println(label);
+
+		logger.info("...");
 		
 		try {
 			String res = context.ar.getSlotPre
@@ -24,30 +26,30 @@ public class ActQueryState implements ActState {
 					, context.venueList.get(context.ap.venue)
 					, context.ap.date
 					);
-			
-			context.setState(new ActStopState());
-			
-//			List<ActSlot> slot = ActUtil.parseSlot(res);
-//			
-//			boolean result = ActUtil.checkValid(context.ap, slot);
-//			if (result) {
-//				
-//				//TODO
-//				// set magic
-//				// set magic
-//				// set location
-//				
+
+			List<ActSlot> slot = ActRequestUtil.parseSlot(res);
+
+			boolean result = ActRequestUtil.checkValid(context.ap, slot);
+			result = false;
+			if (result) {
+
+				//TODO
+				// set magic
+				// set magic
+				// set location
+
+				context.setState(new ActStopState());
 //				context.setState(new ActHoldState());
-//			}
-//			else {
-//				context.ap = context.planList.poll();
-//				if (context.ap == null) {
-//					context.setState(new ActStopState());
-//				}
-//				else {
-//					context.setState(new ActQueryState());
-//				}
-//			}
+			}
+			else {
+				context.ap = context.planList.poll();
+				if (context.ap == null) {
+					context.setState(new ActStopState());
+				}
+				else {
+					context.setState(new ActQueryState());
+				}
+			}
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());

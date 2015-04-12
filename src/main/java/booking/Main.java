@@ -1,8 +1,11 @@
 package booking;
 
+import Act.ActMain;
 import holder.MyRequest;
 import holder.Space;
 import holder.ThreadHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,10 +24,13 @@ public class Main {
 			return ;
 		}
 
-//		ActMain am = new ActMain();
-//		am.go();
+		Logger logger = LoggerFactory.getLogger(Main.class);
+		logger.info("Application starting...");
 
-		go();
+		ActMain am = new ActMain();
+		am.go();
+
+//		go();
 	}
 	
 	public static void test() {

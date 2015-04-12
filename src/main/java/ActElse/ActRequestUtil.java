@@ -7,28 +7,34 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class ActRequestUtil {
+
 	public static Map<String, Integer> parseActivity(String raw) {
-		Map<String, Integer> hm = new HashMap<String, Integer>();
-		Elements ele = Jsoup.parse(raw).getElementsByTag("script");
-		for (int i = 0; i < ele.size(); i++) {
-			if (!ele.get(i).hasAttr("src")) {
-				String text = ele.get(i).data();
-				if (text.contains("activity_list")) {
-					int ali = text.indexOf("activity_list");
-					String al = text.substring(ali);
-					int semicolon = al.indexOf(";");
-					int square = al.indexOf("[");
-					String arr = "{ \"data\" : " + al.substring(square, semicolon) + " }";
-					JSONArray ja = new JSONObject(arr).getJSONArray("data");
-					for (int j = 0; j < ja.length(); j++) {
-						JSONObject each = ja.getJSONObject(j);
-						hm.put(each.getString("name"), Integer.valueOf(each.getString("activity_id")));
-					}
-				}
+		Map<String, Integer> hm = new HashMap<>();
+		Elements ele = Jsoup.parse(raw).select("script[type=text/javascript");
+		for (Element e : ele) {
+			if (e.hasAttr("src"))
+				continue;
+
+			String text = e.data();
+			int ali = text.indexOf("activity_list");
+			if (ali == -1)
+				continue;
+
+			String al = text.substring(ali);
+			int semicolon = al.indexOf(";");
+			int square = al.indexOf("[");
+			String arr = "{ \"data\" : " + al.substring(square, semicolon) + " }";
+			JSONArray ja = new JSONObject(arr).getJSONArray("data");
+			for (int j = 0; j < ja.length(); j++) {
+				JSONObject each = ja.getJSONObject(j);
+				hm.put(each.getString("name"), Integer.valueOf(each.getString("activity_id")));
 			}
+			break;
 		}
 		return hm;
 	}
@@ -44,7 +50,10 @@ public class ActRequestUtil {
 	}
 	
 	public static List<ActSlot> parseSlot(String raw) {
-		//TODO
+		Document doc = Jsoup.parse(raw);
+
+
+
 		return null;
 	}
 	

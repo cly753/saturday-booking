@@ -185,8 +185,7 @@ public class MyRequest {
 			}
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String responseBody = br.lines()
-					.reduce("", String::concat);
+			String responseBody = br.lines().reduce("", String::concat);
 			br.close();
 
 			ArrayList<Space> spaces = null;

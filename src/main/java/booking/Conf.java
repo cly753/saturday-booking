@@ -34,9 +34,7 @@ public class Conf {
 	public static boolean init() throws IOException {
 		System.out.println("Configure File: " + new File(configurePath).getAbsolutePath());
 		Stream<String> lines = Files.lines(Paths.get(configurePath));
-		String configureRaw = lines
-				.reduce("", String::concat);
-		conf = new JSONObject(configureRaw);
+		conf = new JSONObject(lines.reduce("", String::concat));
 
 		lines.close();
 		
@@ -133,6 +131,9 @@ public class Conf {
 	public static String getActPassword() {
 		return conf.getString("ACT_PASSWORD");
 	}
+	public static String getActPasswordEncrypted() {
+		return conf.getString("ACT_PASSWORD_ENCRYPTED");
+	}
 	public static String getActUrlLogin() {
 		return conf.getString("ACT_URL_LOGIN");
 	}
@@ -146,11 +147,11 @@ public class Conf {
 		return conf.getString("ACT_URL_SLOT_PRE");
 	}
 	public static PriorityBlockingQueue<ActPlan> getActPlan() throws JSONException, ParseException {
-		PriorityBlockingQueue<ActPlan> pbq = new PriorityBlockingQueue<ActPlan>();
+		PriorityBlockingQueue<ActPlan> pbq = new PriorityBlockingQueue<>();
 		JSONArray ja = conf.getJSONArray("ACT_PLAN");
 		for (int i = 0; i < ja.length(); i++) {
 			JSONObject jo = ja.getJSONObject(i);
-			List<Integer> hour = new ArrayList<Integer>();
+			List<Integer> hour = new ArrayList<>();
 			JSONArray jahour = jo.getJSONArray("hour");
 			for (int j = 0; j < jahour.length(); j++)
 				hour.add(jahour.getInt(j));
@@ -160,7 +161,8 @@ public class Conf {
 						( jo.getString("activity")
 						, jo.getString("venue")
 						, sdf.parse(jo.getString("date"))
-						, hour, jo.getInt("priority")
+						, hour
+						, jo.getInt("priority")
 						);
 			pbq.put(ap);
 		}

@@ -11,26 +11,33 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import booking.Conf;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ActRequest {
 	private static final String label = "## ActRequest ## ";
+	private static final Logger logger = LoggerFactory.getLogger(ActRequest.class);
 
 	private String host;
+
+	private String publicKey;
+	private String _csrf;
 
 	CookieManager cookieManager;
 	HttpsURLConnection actCon;
 
 	public ActRequest() {
 		host = Conf.getActHost();
-		
+
 		cookieManager = new CookieManager( null, CookiePolicy.ACCEPT_ALL );
 		CookieHandler.setDefault( cookieManager );
 		HttpsURLConnection.setFollowRedirects(true);
@@ -43,11 +50,20 @@ public class ActRequest {
 		actCon.setRequestProperty("Connection", "keep-alive");
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36");
 	}
+	private void retrievePublicKey_csrf(String html) {
+		Document doc = Jsoup.parse(html);
+		Element publicKeyNode = doc.select("input[name=rsapublickey]").first();
+		publicKey = publicKeyNode.attr("value");
+
+		Element _csrfNode = doc.select("input[name=_csrf]").first();
+		_csrf = _csrfNode.attr("value");
+
+		logger.debug("publicKey: " + publicKey);
+		logger.debug("_csrf: " + _csrf);
+	}
 
 	public boolean sayHi() throws Exception {
-		boolean DEBUG = false;
 		String lbl = "## sayHi ## ";
-
 		URL actUrl = new URL(Conf.getActUrlLogin());
 
 		actCon = (HttpsURLConnection) actUrl.openConnection();
@@ -60,8 +76,15 @@ public class ActRequest {
 		actCon.setRequestProperty("Host", actUrl.getHost());
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
-		if (DEBUG) for (Entry<String, List<String>> e : actCon.getHeaderFields().entrySet()) System.out.println(label + lbl + "key: " + e.getKey() + ", value: " + e.getValue());
+		logger.debug("response code: " + responseCode);
+//		for (Entry<String, List<String>> e : actCon.getHeaderFields().entrySet()) logger.debug("key: " + e.getKey() + ", value: " + e.getValue());
+
+		String oneLine, allLine = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
+		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
+		logger.debug("allLine: " + allLine);
+
+		retrievePublicKey_csrf(allLine);
 		return true;
 	}
 
@@ -77,19 +100,25 @@ public class ActRequest {
 		actCon.setDoOutput(true); // including .setRequestMethod("POST");
 		//		actCon.setDoInput(true); // default
 
+		Map<String, String> payload = new HashMap<String, String>();
+		payload.put("email", Conf.getActEmail());
+//		payload.put("ecpassword", ActUtil.encrypt(publicKey, Conf.getActPassword()));
+		payload.put("ecpassword", Conf.getActPasswordEncrypted());
+		payload.put("_csrf", _csrf);
+		String encoded = ActRequestCommonUtil.getDataEncoded(payload);
+
 		DataOutputStream dos = new DataOutputStream(actCon.getOutputStream());
-		//TODO _csrf field?
-		dos.writeBytes("email=" + URLEncoder.encode(email, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&_csrf" + "");
+		dos.writeBytes(encoded);
 		dos.flush(); dos.close();
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
+		logger.debug("response code: " + responseCode);
 		if (DEBUG) System.out.println(label + lbl + actCon.getURL());
 		
-//		String oneLine, allLine = "";
-//		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
-//		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
-//		if (DEBUG) System.out.println(label + lbl + allLine);
+		String oneLine, allLine = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
+		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
+		if (DEBUG) System.out.println(label + lbl + allLine);
 		return true;
 	}
 	private void setLoginHeader() {
@@ -113,7 +142,7 @@ public class ActRequest {
 		setActivityHeader();
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
+		logger.debug(lbl, "response code: " + responseCode);
 
 		String oneLine, allLine = "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));

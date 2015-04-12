@@ -1,9 +1,8 @@
 package ActStateS;
 
 import Act.ActContext;
-import Act.ActEngine;
 import Act.ActState;
-import ActElse.ActUtil;
+import ActElse.ActRequestUtil;
 
 public class ActDeleteState implements ActState {
 	private ActContext context;
@@ -18,10 +17,10 @@ public class ActDeleteState implements ActState {
 		try {
 			String res = context.ar.getCart();
 			
-			int[] bookingIdShoppingCartItemId = ActUtil.parseCart(res);
+			int[] bookingIdShoppingCartItemId = ActRequestUtil.parseCart(res);
 			for (int i = 0; i < bookingIdShoppingCartItemId.length; i += 2) {
 				res = context.ar.delete(bookingIdShoppingCartItemId[i], bookingIdShoppingCartItemId[i + 1]);
-				boolean result = ActUtil.successDelete(res);
+				boolean result = ActRequestUtil.successDelete(res);
 
 				if (result) {
 					;

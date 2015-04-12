@@ -1,9 +1,8 @@
 package ActStateS;
 
 import Act.ActContext;
-import Act.ActEngine;
 import Act.ActState;
-import ActElse.ActUtil;
+import ActElse.ActRequestUtil;
 
 public class ActHoldState implements ActState {
 	ActContext context;
@@ -17,7 +16,7 @@ public class ActHoldState implements ActState {
 		
 		try {
 			String res = context.ar.hold(context.magicUrl, context.magicPayload, context.magicLocation);
-			boolean result = ActUtil.successHold(res);
+			boolean result = ActRequestUtil.successHold(res);
 			if (result) {
 				context.setState(new ActSleepState());
 			}

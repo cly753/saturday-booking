@@ -4,24 +4,28 @@ import java.util.Map.Entry;
 
 import Act.ActContext;
 import Act.ActState;
-import ActElse.ActUtil;
+import ActElse.ActRequestUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ActUnauthorizedState implements ActState {
 	private ActContext context;
 	private static final String label = "## ActUnauthorizedState ## ";
+	private static final Logger logger = LoggerFactory.getLogger(ActUnauthorizedState.class);
+
 
 	@Override
 	public void doAction(ActContext context) {
 		this.context = context;
-		
-		System.out.println(label);
+
+		logger.info("...");
 		
 		try {
 			login();
-//			updateList();
-			
-			context.setState(new ActStopState());
-//			context.setState(new ActQueryState());
+			updateList();
+
+//			context.setState(new ActStopState());
+			context.setState(new ActQueryState());
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
@@ -43,18 +47,16 @@ public class ActUnauthorizedState implements ActState {
 	}
 	
 	private boolean updateList() throws Exception {
-		boolean DEBUG = false;
+		boolean DEBUG = true;
 		
-		String res;
-		
-		res = context.ar.getActivity();
-		context.activityList = ActUtil.parseActivity(res);
+		String res = context.ar.getActivity();
+		context.activityList = ActRequestUtil.parseActivity(res);
 		
 		if (DEBUG) for (Entry<String, Integer> e : context.activityList.entrySet())
 			System.out.println(label + "key: " + e.getKey() + ", value: " + e.getValue());
 		
 		res = context.ar.getVenue(context.activityList.get(context.ap.activity));
-		context.venueList = ActUtil.parseVenue(res);
+		context.venueList = ActRequestUtil.parseVenue(res);
 		
 		//TODO check "max_date" in response
 		

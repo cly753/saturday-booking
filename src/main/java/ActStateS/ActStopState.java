@@ -2,7 +2,6 @@ package ActStateS;
 
 import Act.ActContext;
 import Act.ActState;
-import ActElse.ActUtil;
 
 public class ActStopState implements ActState {
 	ActContext context;

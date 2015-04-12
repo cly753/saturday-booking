@@ -27,7 +27,7 @@ public class ThreadHolder extends Thread {
 		try {
 			while (true) {
 				while (!(goon = gank()))
-					if (new Date().getTime() - openTime.getTime() > 7 * 1000) {
+					if (new Date().getTime() - openTime.getTime() > 4 * 1000) {
 						System.out.println("%\n" + LABEL + " sorry... " + eventDate + "\n%");
 						selfExitEvent();
 						break;
