@@ -4,12 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -45,7 +40,7 @@ public class ActRequest {
 
 	private void setCommonHeader() {
 		// chrome
-		//		actCon.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch"); // causing problem?
+		actCon.setRequestProperty("Accept-Encoding", "deflate, sdch"); // causing problem?
 		actCon.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
 		actCon.setRequestProperty("Connection", "keep-alive");
 		actCon.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36");
@@ -53,10 +48,12 @@ public class ActRequest {
 	private void retrievePublicKey_csrf(String html) {
 		Document doc = Jsoup.parse(html);
 		Element publicKeyNode = doc.select("input[name=rsapublickey]").first();
-		publicKey = publicKeyNode.attr("value");
+		if (publicKeyNode != null)
+			publicKey = publicKeyNode.attr("value");
 
 		Element _csrfNode = doc.select("input[name=_csrf]").first();
-		_csrf = _csrfNode.attr("value");
+		if (_csrfNode != null)
+			_csrf = _csrfNode.attr("value");
 
 		logger.debug("publicKey: " + publicKey);
 		logger.debug("_csrf: " + _csrf);
@@ -85,10 +82,17 @@ public class ActRequest {
 		logger.debug("allLine: " + allLine);
 
 		retrievePublicKey_csrf(allLine);
+
+		for (HttpCookie cook : cookieManager.getCookieStore().getCookies())
+			logger.debug("cookie: " + cook.getValue());
+
+
 		return true;
 	}
 
 	public boolean login(String email, String password) throws Exception {
+		HttpsURLConnection.setFollowRedirects(false);
+
 		boolean DEBUG = true;
 		String lbl = "## login ## ";
 
@@ -98,12 +102,11 @@ public class ActRequest {
 		setLoginHeader();
 
 		actCon.setDoOutput(true); // including .setRequestMethod("POST");
-		//		actCon.setDoInput(true); // default
+		actCon.setDoInput(true); // default
 
 		Map<String, String> payload = new HashMap<String, String>();
 		payload.put("email", Conf.getActEmail());
-//		payload.put("ecpassword", ActUtil.encrypt(publicKey, Conf.getActPassword()));
-		payload.put("ecpassword", Conf.getActPasswordEncrypted());
+		payload.put("ecpassword", ActUtil.encrypt(publicKey, Conf.getActPassword()));
 		payload.put("_csrf", _csrf);
 		String encoded = ActRequestCommonUtil.getDataEncoded(payload);
 
@@ -112,13 +115,23 @@ public class ActRequest {
 		dos.flush(); dos.close();
 
 		int responseCode = actCon.getResponseCode();
-		logger.debug("response code: " + responseCode);
-		if (DEBUG) System.out.println(label + lbl + actCon.getURL());
-		
+
+		for (Map.Entry<String, List<String>> e : actCon.getRequestProperties().entrySet())
+			for (String val : e.getValue())
+				logger.debug("request  header: " + e.getKey() + ": " + val);
+
+		logger.debug("response code  : " + responseCode);
+		logger.debug("current url    : " + actCon.getURL());
+		logger.debug("response msg   : " + actCon.getResponseMessage());
+		for (Map.Entry<String, List<String>> e : actCon.getHeaderFields().entrySet())
+			for (String val : e.getValue())
+				logger.debug("response header: " + e.getKey() + ": " + val);
+
 		String oneLine, allLine = "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream(), "UTF-8"));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine;  br.close();
-		if (DEBUG) System.out.println(label + lbl + allLine);
+
+		logger.debug("response content: " + allLine);
 		return true;
 	}
 	private void setLoginHeader() {
@@ -170,6 +183,7 @@ public class ActRequest {
 		setVenueHeader();
 
 		int responseCode = actCon.getResponseCode();
+		logger.debug(lbl, "response code: " + responseCode);
 		if (DEBUG) System.out.println("response code = " + responseCode);
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
@@ -192,7 +206,7 @@ public class ActRequest {
 
 		URL actUrl = new URL(Conf.getActUrlSlotPre() + "?" + getSlotPrePayload(activity_id, venue_id, date));
 
-		if (DEBUG) System.out.println(label + lbl + actUrl);
+		logger.debug(lbl + actUrl.toString());
 
 		actCon = (HttpsURLConnection) actUrl.openConnection();
 		actCon.setRequestMethod("GET");
@@ -200,12 +214,12 @@ public class ActRequest {
 		setSlotPreHeader();
 
 		int responseCode = actCon.getResponseCode();
-		if (DEBUG) System.out.println(label + lbl + "response code = " + responseCode);
+		logger.debug(lbl + "response code: " + responseCode);
 
 		String oneLine, allLine = ""; BufferedReader br = new BufferedReader(new InputStreamReader(actCon.getInputStream()));
 		while ((oneLine = br.readLine()) != null) allLine += oneLine; br.close();
 
-		if (DEBUG) System.out.println(allLine);
+		logger.debug(lbl + "allLine: " + allLine);
 		return allLine;
 	}
 	private void setSlotPreHeader() {

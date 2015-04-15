@@ -6,6 +6,8 @@ public class ActSlot {
 	public String dayInWeek;
 	public String dayInMonth;
 	public Integer hour;
+
+	public boolean available;
 	
 	public ActSlot() {
 		

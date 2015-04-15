@@ -27,10 +27,10 @@ public class Main {
 		Logger logger = LoggerFactory.getLogger(Main.class);
 		logger.info("Application starting...");
 
-		ActMain am = new ActMain();
-		am.go();
+//		ActMain am = new ActMain();
+//		am.go();
 
-//		go();
+		go();
 	}
 	
 	public static void test() {

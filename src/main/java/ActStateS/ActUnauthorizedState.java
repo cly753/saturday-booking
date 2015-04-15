@@ -24,8 +24,8 @@ public class ActUnauthorizedState implements ActState {
 			login();
 			updateList();
 
-//			context.setState(new ActStopState());
-			context.setState(new ActQueryState());
+			context.setState(new ActStopState());
+//			context.setState(new ActQueryState());
 		} catch (InterruptedException e) {
 			//TODO change to logger
 			System.out.println(e.getClass().getSimpleName());
@@ -47,7 +47,7 @@ public class ActUnauthorizedState implements ActState {
 	}
 	
 	private boolean updateList() throws Exception {
-		boolean DEBUG = true;
+		boolean DEBUG = false;
 		
 		String res = context.ar.getActivity();
 		context.activityList = ActRequestUtil.parseActivity(res);

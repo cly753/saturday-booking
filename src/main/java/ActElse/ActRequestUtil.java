@@ -10,8 +10,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ActRequestUtil {
+
+	private static final Logger logger = LoggerFactory.getLogger(ActRequestUtil.class);
 
 	public static Map<String, Integer> parseActivity(String raw) {
 		Map<String, Integer> hm = new HashMap<>();
@@ -52,7 +56,11 @@ public class ActRequestUtil {
 	public static List<ActSlot> parseSlot(String raw) {
 		Document doc = Jsoup.parse(raw);
 
+		Elements slotEle = doc.select("input[name=timeslot[]");
 
+		logger.info("found " + slotEle.size() + " slots...");
+		for (Element e : slotEle)
+			logger.debug(e.toString());
 
 		return null;
 	}

@@ -24,11 +24,11 @@ public class ActRequestCommonUtil {
 
             encoded += URLEncoder.encode(e.getKey(), "UTF-8") + "=" + URLEncoder.encode(e.getValue(), "UTF-8");
 
-            logger.debug("payload.key = " + e.getKey());
-            logger.debug("payload.value = " + e.getValue());
+//            logger.debug("payload.key = " + e.getKey());
+//            logger.debug("payload.value = " + e.getValue());
         }
 
-        logger.debug("encoded", encoded);
+        logger.debug("encoded: " + encoded);
         return encoded;
     }
 }
