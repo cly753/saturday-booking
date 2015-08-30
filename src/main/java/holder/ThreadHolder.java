@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import booking.ActionListener;
 import booking.Conf;
@@ -28,24 +29,28 @@ public class ThreadHolder extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				while (!(goon = gank()))
-					if (new Date().getTime() - openTime.getTime() > 4 * 1000) {
-						logger.warn("Sorry... Failed to hold " + eventDate);
+                Random ran = new Random();
+				int tryTimes = 2;
+				while (!(goon = gank())) {
+					tryTimes--;
+					if (tryTimes < 1 && new Date().getTime() - openTime.getTime() > 15 * 1000) {
+						logger.warn(Conf.eventFormat.format(eventDate) + " Sorry... Failed to hold " + eventDate);
 						selfExitEvent();
 						break;
 					}
+				}
 
 				if (!goon) break;
-				else logger.info("ok: " + eventDate + " " + this.basketSession);
+				else logger.info(Conf.eventFormat.format(eventDate) + " [OK] " + this.basketSession);
 
-				logger.info("Going to sleep...");
+				logger.info(Conf.eventFormat.format(eventDate) + " Going to sleep...");
 				Thread.sleep(interval);
 
 				push();
 				openTime = new Date();
 			}
 		} catch (InterruptedException e) {
-			logger.info("Exception: " + e.getMessage());
+			logger.info(Conf.eventFormat.format(eventDate) + " Exception: " + e.getMessage());
 			push();
 		}
 	}
@@ -68,20 +73,20 @@ public class ThreadHolder extends Thread {
 	}
 
 	public boolean gank() {
-		logger.info("Gank: " + Conf.eventFormat.format(eventDate));
+		logger.info(Conf.eventFormat.format(eventDate) + " [Gank]");
 		boolean ok = MyRequest.requestAdd(this);
 		if (!ok)
 			while (MyRequest.error.size() > 0)
-				logger.warn("Holder: " + MyRequest.error.poll());
+				logger.warn(Conf.eventFormat.format(eventDate) + " Holder: " + MyRequest.error.poll());
 		return ok;
 	}
 
 	public boolean push() {
-		logger.info("Push() %%%");
+		logger.info(Conf.eventFormat.format(eventDate) + " Push() %%%");
 		boolean ok = MyRequest.requestRemoveAll(this);
 		if (!ok)
 			while (MyRequest.error.size() > 0)
-				logger.warn("Holder: " + MyRequest.error.poll());
+				logger.warn(Conf.eventFormat.format(eventDate) + " Holder: " + MyRequest.error.poll());
 		return ok;
 	}
 
